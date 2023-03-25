@@ -46,10 +46,8 @@ pub use hardware::SUBSTRATE_REFERENCE_HARDWARE;
 /// You can use the `--base-path` flag to set a location for the disk benchmarks.
 #[derive(Debug, Parser)]
 pub struct MachineCmd {
-    // #[allow(missing_docs)]
-    // #[clap(flatten)]
-    // pub shared_params: SharedParams,
-    #[arg(long)]
+    /// Path to database.
+    #[arg(long, short = 'd')]
     pub base_path: Option<String>,
 
     /// Do not return an error if any check fails.
