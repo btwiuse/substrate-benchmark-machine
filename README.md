@@ -6,7 +6,7 @@ The `benchmark machine` command archives this by measuring key metrics and makin
 
 Invoking the command looks like this:  
 ```sh
-cargo run --profile=production -- benchmark machine --dev
+cargo run https://github.com/btwiuse/substrate-benchmark-machine
 ```
 
 ## Output
@@ -14,19 +14,13 @@ cargo run --profile=production -- benchmark machine --dev
 The output on reference hardware:  
 
 ```pre
-+----------+----------------+---------------+--------------+-------------------+
-| Category | Function       | Score         | Minimum      | Result            |
-+----------+----------------+---------------+--------------+-------------------+
-| CPU      | BLAKE2-256     | 1023.00 MiB/s | 1.00 GiB/s   | ✅ Pass ( 99.4 %) |
-+----------+----------------+---------------+--------------+-------------------+
-| CPU      | SR25519-Verify | 665.13 KiB/s  | 666.00 KiB/s | ✅ Pass ( 99.9 %) |
-+----------+----------------+---------------+--------------+-------------------+
-| Memory   | Copy           | 14.39 GiB/s   | 14.32 GiB/s  | ✅ Pass (100.4 %) |
-+----------+----------------+---------------+--------------+-------------------+
-| Disk     | Seq Write      | 457.00 MiB/s  | 450.00 MiB/s | ✅ Pass (101.6 %) |
-+----------+----------------+---------------+--------------+-------------------+
-| Disk     | Rnd Write      | 190.00 MiB/s  | 200.00 MiB/s | ✅ Pass ( 95.0 %) |
-+----------+----------------+---------------+--------------+-------------------+
+[INFO] 🏁 CPU score: 1.42 GiBs (✅ Blake2256: expected minimum 1.00 GiBs)                                                                                                                                        [INFO] 🏁 Memory score: 17.93 GiBs (✅ MemCopy: expected minimum 14.32 GiBs)                                                                                                                                     [INFO] 🏁 Disk score (seq. writes): 397.35 MiBs (❌ DiskSeqWrite: expected minimum 450.00 MiBs)                                                                                                                  [INFO] 🏁 Disk score (rand. writes): 193.44 MiBs (❌ DiskRndWrite: expected minimum 200.00 MiBs)                                                                                                                 [INFO] ⚠  The hardware does not meet the minimal requirements for role 'Authority'.                                                                                                                              [INFO] Running machine benchmarks...                                                                                                                                                                             [INFO]                                                                                                                                                                                                           +----------+----------------+-------------+-------------+-------------------+                                                                                                                                    | Category | Function       | Score       | Minimum     | Result            |                                                                                                                                    +===========================================================================+                                                                                                                                    | CPU      | BLAKE2-256     | 1.42 GiBs   | 1.00 GiBs   | ✅ Pass (141.3 %) |                                                                                                                                    |----------+----------------+-------------+-------------+-------------------|                                                                                                                                    | CPU      | SR25519-Verify | 726.21 KiBs | 666.00 KiBs | ✅ Pass (109.0 %) |                                                                                                                                    |----------+----------------+-------------+-------------+-------------------|
+| Memory   | Copy           | 18.10 GiBs  | 14.32 GiBs  | ✅ Pass (126.4 %) |                                                                                                                                    |----------+----------------+-------------+-------------+-------------------|                                                                                                                                    | Disk     | Seq Write      | 398.56 MiBs | 450.00 MiBs | ❌ Fail ( 88.6 %) |                                                                                                                                    |----------+----------------+-------------+-------------+-------------------|
+| Disk     | Rnd Write      | 193.37 MiBs | 200.00 MiBs | ✅ Pass ( 96.7 %) |
++----------+----------------+-------------+-------------+-------------------+
+From 5 benchmarks in total, 4 passed and 1 failed (10% fault tolerance).
+[INFO] The hardware fails to meet the requirements
+Error: One of the benchmarks had a score that was lower than its requirement
 ```
 
 The *score* is the average result of each benchmark. It always adheres to "higher is better".  

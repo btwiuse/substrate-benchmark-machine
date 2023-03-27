@@ -29,8 +29,8 @@ use log::{error, info, warn};
 use sc_cli::Result;
 use sc_sysinfo::{
     benchmark_cpu, benchmark_disk_random_writes, benchmark_disk_sequential_writes,
-    benchmark_memory, benchmark_sr25519_verify, ExecutionLimit, Metric, Requirement, Requirements,
-    Throughput,
+    benchmark_memory, benchmark_sr25519_verify, ExecutionLimit, HwBench, Metric, Requirement,
+    Requirements, Throughput,
 };
 
 // use crate::shared::check_build_profile;
@@ -49,6 +49,10 @@ pub struct MachineCmd {
     /// Path to database.
     #[arg(long, short = 'd')]
     pub base_path: Option<String>,
+
+    /// Run the full benchmark and show the result as a table.
+    #[arg(long, short = 'f', default_value_t = true)]
+    pub full: bool,
 
     /// Do not return an error if any check fails.
     ///
@@ -145,6 +149,18 @@ impl MachineCmd {
         Ok(score)
     }
 
+    pub fn print_full_table(&self, dir: &Path) -> Result<()> {
+        info!("Running machine benchmarks...");
+        let requirements = &SUBSTRATE_REFERENCE_HARDWARE.clone();
+        let mut results = Vec::new();
+        for requirement in &requirements.0 {
+            let result = self.run_benchmark(requirement, &dir)?;
+            results.push(result);
+        }
+        self.print_summary(requirements.clone(), results)?;
+        Ok(())
+    }
+
     /// Prints a human-readable summary.
     pub fn print_summary(
         &self,
@@ -181,12 +197,6 @@ impl MachineCmd {
         } else {
             info!("The hardware meets the requirements ");
         }
-        // Check that the results were not created by a bad build profile.
-        /*
-        if let Err(err) = check_build_profile() {
-            self.check_failed(Error::BadBuildProfile(err))?;
-        }
-        */
         Ok(())
     }
 
@@ -223,4 +233,90 @@ impl BenchResult {
         ]
         .into()
     }
+}
+
+fn status_emoji(s: bool) -> String {
+    if s {
+        "✅".into()
+    } else {
+        "❌".into()
+    }
+}
+
+/// Whether the hardware requirements are met by the provided benchmark results.
+pub fn check_hardware(hwbench: &HwBench) -> bool {
+    let req = &SUBSTRATE_REFERENCE_HARDWARE;
+
+    let mut cpu_ok = true;
+    let mut mem_ok = true;
+    let mut dsk_seq_write_ok = true;
+    let mut dsk_rnd_write_ok = true;
+
+    for requirement in req.0.iter() {
+        match requirement.metric {
+            Metric::Blake2256 => {
+                if requirement.minimum > hwbench.cpu_hashrate_score {
+                    cpu_ok = false;
+                }
+                info!(
+                    "🏁 CPU score: {} ({})",
+                    hwbench.cpu_hashrate_score,
+                    format!(
+                        "{} Blake2256: expected minimum {}",
+                        status_emoji(cpu_ok),
+                        requirement.minimum
+                    )
+                );
+            }
+            Metric::MemCopy => {
+                if requirement.minimum > hwbench.memory_memcpy_score {
+                    mem_ok = false;
+                }
+                info!(
+                    "🏁 Memory score: {} ({})",
+                    hwbench.memory_memcpy_score,
+                    format!(
+                        "{} MemCopy: expected minimum {}",
+                        status_emoji(mem_ok),
+                        requirement.minimum
+                    )
+                );
+            }
+            Metric::DiskSeqWrite => {
+                if let Some(score) = hwbench.disk_sequential_write_score {
+                    if requirement.minimum > score {
+                        dsk_seq_write_ok = false;
+                    }
+                    info!(
+                        "🏁 Disk score (seq. writes): {} ({})",
+                        score,
+                        format!(
+                            "{} DiskSeqWrite: expected minimum {}",
+                            status_emoji(dsk_seq_write_ok),
+                            requirement.minimum
+                        )
+                    );
+                }
+            }
+            Metric::DiskRndWrite => {
+                if let Some(score) = hwbench.disk_random_write_score {
+                    if requirement.minimum > score {
+                        dsk_rnd_write_ok = false;
+                    }
+                    info!(
+                        "🏁 Disk score (rand. writes): {} ({})",
+                        score,
+                        format!(
+                            "{} DiskRndWrite: expected minimum {}",
+                            status_emoji(dsk_rnd_write_ok),
+                            requirement.minimum
+                        )
+                    );
+                }
+            }
+            Metric::Sr25519Verify => {}
+        }
+    }
+
+    cpu_ok && mem_ok && dsk_seq_write_ok && dsk_rnd_write_ok
 }
