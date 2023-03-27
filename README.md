@@ -110,31 +110,29 @@ License: Apache-2.0
 
 ### How to solve `⚠  The hardware does not meet the minimal requirements for role 'Authority'.`
 
-This error message may appear when a substrate validator node does quick
-hardware check while starting up for different reasons:
+This error message may appear for different reasons:
 
-a) You node have low specs.
+a) You node has low-spec hardware.
 
-b) Your node meets the minimum requirement, but
+b) Your node meets the minimum requirement, but:
 
-- b.1) you have other CPU/IO intensive process running while the node starts.
+- you have other CPU/IO intensive process running while the node starts.
 
-- b.2) the quick check doesn't have any tolerance of slightly lower scores.
+- the quick check doesn't have any tolerance of slightly lower scores.
 
-In order to decide if you should upgrade your node spec, you should stop the
-gear node and other resource-heavy processes, and run the full machine
-benchmark:
+In order to decide if you should upgrade your hardware, you should stop the gear
+node and other resource-heavy processes, and run the full machine benchmark:
 
 ```
 substrate-benchmark-machine --full
 ```
 
-If some of the benchmarks still fail, you should upgrade your node spec
-accordingly until you get all 5 ✅, otherwise you don't have to.
+If some of the benchmarks still fail, then you should upgrade your hardware
+accordingly until you get all 5 ✅'s, otherwise you don't have to.
 
-Note that if you get low CPU scores, increasing the number of cores isn't gonna
-help because it measures only single-core performance, you should upgrade to
-more powerful processors instead.
+Note that in case you get low CPU scores, increasing the number of cores isn't
+gonna help because it measures only single-core performance, you should upgrade
+to more powerful processors to get higher scores.
 
 <!-- LINKS -->
 
