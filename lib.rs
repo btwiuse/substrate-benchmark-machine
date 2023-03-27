@@ -50,8 +50,8 @@ pub struct MachineCmd {
     #[arg(long, short = 'd')]
     pub base_path: Option<String>,
 
-    /// Run the full benchmark and show the result as a table.
-    #[arg(long, short = 'f', default_value_t = true)]
+    /// Run full benchmarks instead of quick hardware check.
+    #[arg(long, short = 'f')]
     pub full: bool,
 
     /// Do not return an error if any check fails.
@@ -150,7 +150,7 @@ impl MachineCmd {
     }
 
     pub fn print_full_table(&self, dir: &Path) -> Result<()> {
-        info!("Running machine benchmarks...");
+        info!("Running full machine benchmarks...");
         let requirements = &SUBSTRATE_REFERENCE_HARDWARE.clone();
         let mut results = Vec::new();
         for requirement in &requirements.0 {
@@ -245,6 +245,7 @@ fn status_emoji(s: bool) -> String {
 
 /// Whether the hardware requirements are met by the provided benchmark results.
 pub fn check_hardware(hwbench: &HwBench) -> bool {
+    info!("Performing quick hardware check...");
     let req = &SUBSTRATE_REFERENCE_HARDWARE;
 
     let mut cpu_ok = true;

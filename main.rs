@@ -16,14 +16,14 @@ fn main() -> Result<()> {
     fs::create_dir_all(&base_path)?;
     let dir = Path::new(&base_path);
 
-    let hwbench = gather_hwbench(Some(dir));
-    if !check_hardware(&hwbench) {
-        info!("⚠  The hardware does not meet the minimal requirements for role 'Authority'.");
+    if !cmd.full {
+        let hwbench = gather_hwbench(Some(dir));
+        if !check_hardware(&hwbench) {
+            info!("⚠  The hardware does not meet the minimal requirements for role 'Authority'.");
+        } else {
+            info!("🎉 The hardware meets the minimal requirements for role 'Authority'.");
+        }
     } else {
-        info!("🎉 The hardware meets the minimal requirements for role 'Authority'.");
-    }
-
-    if cmd.full {
         cmd.print_full_table(&dir)?;
     }
 
