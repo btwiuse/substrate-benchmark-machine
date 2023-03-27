@@ -130,7 +130,11 @@ substrate-benchmark-machine --full
 ```
 
 If some of the benchmarks still fail, you should upgrade your node spec
-accordingly until you get all 5 ✅; otherwise you don't have to.
+accordingly until you get all 5 ✅, otherwise you don't have to.
+
+Note that if you get low CPU scores, increasing the number of cores isn't gonna
+help because it measures only single-core performance, you should upgrade to
+more powerful processors instead.
 
 <!-- LINKS -->
 
