@@ -1,4 +1,7 @@
 [toolchain]
-channel = "stable"
-targets = ["x86_64-unknown-linux-musl"]
+channel = "nightly"
 profile = "default"
+targets = [
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-musl",
+]
