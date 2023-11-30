@@ -1,7 +1,7 @@
 {
   description = "Example cross-compiling rust w/ openssl for aarch64-unknown-linux-musl";
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
   outputs = {
     self,
     nixpkgs,
@@ -25,6 +25,9 @@
 
       nativeBuildInputs = with pkgs; [
       # pkg-config
+      # protobuf
+      # https://www.reddit.com/r/rust/comments/11okj5w/rust_crosscompilation_without_struggles_by_using/
+        pkgs.pkgsBuildHost.protobuf
       ];
       buildInputs = with pkgs; [
       # openssl

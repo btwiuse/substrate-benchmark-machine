@@ -1,3 +1,7 @@
+nix:
+	# sudo nix daemon
+	# sudo nix build
+
 musl: musl-deps musl-amd64 musl-arm64
 
 musl-deps:
