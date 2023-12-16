@@ -16,6 +16,9 @@ path = "lib.rs"
 name = "substrate-benchmark-machine"
 path = "main.rs"
 
+[profile.release]
+strip = true
+
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
