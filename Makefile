@@ -6,6 +6,14 @@ zigbuild:
 	# cargo zigbuild --release --target x86_64-apple-darwin
 	# cargo zigbuild --release --target x86_64-pc-windows-gnu
 
+release:
+	@ mkdir -p dist
+	@ cp -v target/x86_64-unknown-linux-musl/release/substrate-benchmark-machine ./dist/substrate-benchmark-machine-linux-amd64-static
+	@ cp -v target/aarch64-unknown-linux-musl/release/substrate-benchmark-machine ./dist/substrate-benchmark-machine-linux-aarch64-static
+	@ file dist/*
+	@ du -sh dist/*
+	@ zip -r dist.zip dist
+
 nix:
 	# sudo nix daemon
 	# sudo nix build
