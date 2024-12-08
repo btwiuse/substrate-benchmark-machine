@@ -4,7 +4,7 @@ use log::info;
 use sc_sysinfo::gather_hwbench;
 use std::fs;
 use std::path::Path;
-use substrate_benchmark_machine::{check_hardware, MachineCmd};
+use substrate_benchmark_machine::{check_hardware, MachineCmd, SUBSTRATE_REFERENCE_HARDWARE};
 
 fn main() -> Result<()> {
     lg::info::init()?;
@@ -17,7 +17,7 @@ fn main() -> Result<()> {
     let dir = Path::new(&base_path);
 
     if !cmd.full {
-        let hwbench = gather_hwbench(Some(dir));
+        let hwbench = gather_hwbench(Some(dir), &SUBSTRATE_REFERENCE_HARDWARE);
         if !check_hardware(&hwbench) {
             info!("⚠  The hardware does not meet the minimal requirements for role 'Authority'.");
         } else {

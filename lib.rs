@@ -28,9 +28,9 @@ use log::{error, info, warn};
 
 use sc_cli::Result;
 use sc_sysinfo::{
-    benchmark_cpu, benchmark_disk_random_writes, benchmark_disk_sequential_writes,
-    benchmark_memory, benchmark_sr25519_verify, ExecutionLimit, HwBench, Metric, Requirement,
-    Requirements, Throughput,
+    benchmark_cpu, benchmark_cpu_parallelism, benchmark_disk_random_writes,
+    benchmark_disk_sequential_writes, benchmark_memory, benchmark_sr25519_verify, ExecutionLimit,
+    HwBench, Metric, Requirement, Requirements, Throughput,
 };
 
 // use crate::shared::check_build_profile;
@@ -142,6 +142,9 @@ impl MachineCmd {
         let score = match metric {
             Metric::Blake2256 => benchmark_cpu(hash_limit),
             Metric::Sr25519Verify => benchmark_sr25519_verify(verify_limit),
+            Metric::Blake2256Parallel { num_cores } => {
+                benchmark_cpu_parallelism(hash_limit, *num_cores)
+            }
             Metric::MemCopy => benchmark_memory(memory_limit),
             Metric::DiskSeqWrite => benchmark_disk_sequential_writes(disk_limit, dir)?,
             Metric::DiskRndWrite => benchmark_disk_random_writes(disk_limit, dir)?,
@@ -249,6 +252,7 @@ pub fn check_hardware(hwbench: &HwBench) -> bool {
     let req = &SUBSTRATE_REFERENCE_HARDWARE;
 
     let mut cpu_ok = true;
+    let mut parallel_cpu_ok = true;
     let mut mem_ok = true;
     let mut dsk_seq_write_ok = true;
     let mut dsk_rnd_write_ok = true;
@@ -265,6 +269,20 @@ pub fn check_hardware(hwbench: &HwBench) -> bool {
                     format!(
                         "{} Blake2256: expected minimum {}",
                         status_emoji(cpu_ok),
+                        requirement.minimum
+                    )
+                );
+            }
+            Metric::Blake2256Parallel { .. } => {
+                if requirement.minimum > hwbench.parallel_cpu_hashrate_score {
+                    parallel_cpu_ok = false;
+                }
+                info!(
+                    "🏁 Parallel CPU score: {} ({})",
+                    hwbench.parallel_cpu_hashrate_score,
+                    format!(
+                        "{} Blake2256Parallel: expected minimum {}",
+                        status_emoji(parallel_cpu_ok),
                         requirement.minimum
                     )
                 );
